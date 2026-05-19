@@ -101,6 +101,7 @@ jobs:
 
       - name: NuGet login
         uses: NuGet/login@v1
+        id: nuget-login
         with:
           user: mamby
 
@@ -118,6 +119,7 @@ jobs:
             Write-Host "Publishing $($package.FullName)..."
 
             dotnet nuget push $package.FullName `
+              --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" `
               --source $env:NUGET_SOURCE `
               --skip-duplicate
           }
