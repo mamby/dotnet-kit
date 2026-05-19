@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <AssemblyName>Mamby.AspNet</AssemblyName>
+    <RootNamespace>Mamby.AspNet</RootNamespace>
+    <PackageId>Mamby.AspNet</PackageId>
+    <Description>Opinionated ASP.NET utilities.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\dotnet\Mamby.DotNet.csproj" />
+  </ItemGroup>
+</Project>

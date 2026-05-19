@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <AssemblyName>Mamby.DotNet</AssemblyName>
+    <RootNamespace>Mamby.DotNet</RootNamespace>
+    <PackageId>Mamby.DotNet</PackageId>
+    <Description>Opinionated .NET utilities.</Description>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+</Project>
