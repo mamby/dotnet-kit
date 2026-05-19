@@ -1,0 +1,124 @@
+name: Build & Publish NuGet Packages
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: windows-2025-vs2026
+    environment: release
+
+    permissions:
+      contents: read
+      id-token: write
+
+    env:
+      SOLUTION_PATH: dotnet-kit.slnx
+      ARTIFACTS_PATH: ./nupkg
+      NUGET_SOURCE: https://api.nuget.org/v3/index.json
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup .NET 11 Preview
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "11.0.x"
+
+      - name: Get package version
+        shell: pwsh
+        run: |
+          if ("${{ github.ref_type }}" -eq "tag" -and "${{ github.ref_name }}".StartsWith("v")) {
+            $version = "${{ github.ref_name }}".Substring(1)
+          }
+          else {
+            $version = "0.1.0-preview.$env:GITHUB_RUN_NUMBER"
+          }
+
+          "PACKAGE_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Append
+          Write-Host "Package version: $version"
+
+      - name: Install MAUI workload
+        shell: pwsh
+        run: |
+          dotnet workload install maui
+
+      - name: Restore workloads
+        shell: pwsh
+        run: |
+          dotnet workload restore $env:SOLUTION_PATH
+
+      - name: Restore dependencies
+        shell: pwsh
+        run: |
+          dotnet restore $env:SOLUTION_PATH
+
+      - name: Build projects
+        shell: pwsh
+        run: |
+          dotnet build $env:SOLUTION_PATH `
+            --configuration Release `
+            --no-restore
+
+      - name: Test projects
+        shell: pwsh
+        run: |
+          dotnet test $env:SOLUTION_PATH `
+            --configuration Release `
+            --no-build `
+            --no-restore
+
+      - name: Pack projects
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path $env:ARTIFACTS_PATH | Out-Null
+
+          $projects = @(
+            "src/Mamby.Results/Mamby.Results.csproj",
+            "src/Mamby.AspNetCore/Mamby.AspNetCore.csproj",
+            "src/Mamby.Maui/Mamby.Maui.csproj",
+            "src/Mamby.Build/Mamby.Build.csproj"
+          )
+
+          foreach ($project in $projects) {
+            if (Test-Path $project) {
+              Write-Host "Packing $project..."
+
+              dotnet pack $project `
+                --configuration Release `
+                --no-build `
+                --no-restore `
+                -p:PackageVersion="$env:PACKAGE_VERSION" `
+                -o $env:ARTIFACTS_PATH
+            }
+            else {
+              Write-Host "Skipping missing project: $project"
+            }
+          }
+
+      - name: NuGet login
+        uses: NuGet/login@v1
+        with:
+          user: mamby
+
+      - name: Publish packages to NuGet.org
+        shell: pwsh
+        run: |
+          $packages = Get-ChildItem -Path $env:ARTIFACTS_PATH -Filter "*.nupkg" |
+            Where-Object { $_.Name -notlike "*.symbols.nupkg" }
+
+          if (-not $packages) {
+            throw "No NuGet packages found in $env:ARTIFACTS_PATH"
+          }
+
+          foreach ($package in $packages) {
+            Write-Host "Publishing $($package.FullName)..."
+
+            dotnet nuget push $package.FullName `
+              --source $env:NUGET_SOURCE `
+              --skip-duplicate
+          }
