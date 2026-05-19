@@ -78,10 +78,9 @@ jobs:
           New-Item -ItemType Directory -Force -Path $env:ARTIFACTS_PATH | Out-Null
 
           $projects = @(
-            "src/Mamby.Results/Mamby.Results.csproj",
-            "src/Mamby.AspNetCore/Mamby.AspNetCore.csproj",
-            "src/Mamby.Maui/Mamby.Maui.csproj",
-            "src/Mamby.Build/Mamby.Build.csproj"
+            "src/dotnet/Mamby.DotNet.csproj",
+            "src/aspnet/Mamby.AspNet.csproj",
+            "src/maui/Mamby.Maui.csproj"
           )
 
           foreach ($project in $projects) {
