@@ -1,4 +1,6 @@
 <Solution>
   <Project Path="src/aspnet/Mamby.AspNet.csproj" />
   <Project Path="src/dotnet/Mamby.DotNet.csproj" />
+  <Project Path="test/aspnet/Mamby.AspNet.Tests.csproj" />
+  <Project Path="test/dotnet/Mamby.DotNet.Tests.csproj" />
 </Solution>
