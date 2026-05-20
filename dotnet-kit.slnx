@@ -1,6 +1,4 @@
 <Solution>
   <Project Path="src/aspnet/Mamby.AspNet.csproj" />
   <Project Path="src/dotnet/Mamby.DotNet.csproj" />
-  <Project Path="src/maui/Mamby.Maui.csproj" />
-  <Project Path="test/maui/Mamby.Maui.Tests.csproj" />
 </Solution>
