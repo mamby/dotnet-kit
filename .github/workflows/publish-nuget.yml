@@ -42,16 +42,6 @@ jobs:
           "PACKAGE_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Append
           Write-Host "Package version: $version"
 
-      - name: Install MAUI workload
-        shell: pwsh
-        run: |
-          dotnet workload install maui
-
-      - name: Restore workloads
-        shell: pwsh
-        run: |
-          dotnet workload restore $env:SOLUTION_PATH
-
       - name: Restore dependencies
         shell: pwsh
         run: |
@@ -79,8 +69,7 @@ jobs:
 
           $projects = @(
             "src/dotnet/Mamby.DotNet.csproj",
-            "src/aspnet/Mamby.AspNet.csproj",
-            "src/maui/Mamby.Maui.csproj"
+            "src/aspnet/Mamby.AspNet.csproj"
           )
 
           foreach ($project in $projects) {
